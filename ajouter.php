@@ -18,12 +18,6 @@ if (!$_SESSION['nom']) {
 
 <body>
 
-    <?php
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $result = mysqli_query($bdd, "select noemp from employes;");
-    $donnees = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    ?>
     <form action="requet-ajout.php" method="POST">
         <input type="hidden" readonly class="form-control" name="noemp">
         <input type=" text" class="form-control" name="nom" placeholder="modifier nom">

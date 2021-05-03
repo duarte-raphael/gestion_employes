@@ -23,12 +23,9 @@ if (!$_SESSION['nom']) {
     $isThereError = false;
     $messages = [];
     if (isset($_GET["id"])) {
-        $id = $_GET["id"];
-        $bdd = mysqli_init();
-        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-        $result = mysqli_query($bdd, "SELECT * from employes where noemp =" . $id . ";");
-        $donnees = mysqli_fetch_array($result, MYSQLI_ASSOC);
+        $donnees = selectAllById($_GET["id"]);
     }
+
     if (!empty($_POST)) {
         if (
             !isset($_POST["nom"]) || empty($_POST["nom"]) || !preg_match("#^[a-z-\s]*$#i", $_POST["nom"])
@@ -68,24 +65,15 @@ if (!$_SESSION['nom']) {
             $messages[] = "Erreur de saisie dans la commission";
         }
 
+        if ($_POST["comm"] == "") {
+            $commission = "null";
+        } else {
+            $commission = $_POST["comm"];
+        }
 
         if (!$isThereError) {
-            $bdd = mysqli_init();
-            mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-            $requette = "UPDATE employes SET 
-    nom = '" . $_POST["nom"] . "',
-    prenom = '" . $_POST["prenom"] . "',
-    emploi = '" . $_POST["emploi"] . "',
-    sup = " . $_POST["sup"] . ",
-    embauche = '" . $_POST["embauche"] . "',
-    sal = " . $_POST["sal"] . ",
-    comm = " . $_POST["comm"] . ",
-    noserv = " . $_POST["noserv"] . "
-    WHERE noemp = " . $_POST["id"] . ";";
-            var_dump($requette);
-            var_dump($_POST);
-            mysqli_query($bdd, $requette);
-            mysqli_close($bdd);
+            updateEmploye($_POST, $commission);
+
             header("location: tableau.php");
         }
     }
@@ -117,3 +105,34 @@ if (!$_SESSION['nom']) {
 </body>
 
 </html>
+
+<?php
+
+function updateEmploye($tab, $comm)
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $requette = "UPDATE employes SET 
+nom = '" . $tab["nom"] . "',
+prenom = '" . $tab["prenom"] . "',
+emploi = '" . $tab["emploi"] . "',
+sup = " . $tab["sup"] . ",
+embauche = '" . $tab["embauche"] . "',
+sal = " . $tab["sal"] . ",
+comm = " . $comm . ",
+noserv = " . $tab["noserv"] . "
+WHERE noemp = " . $tab["id"] . ";";
+    mysqli_query($bdd, $requette);
+    mysqli_close($bdd);
+}
+
+function selectAllById($id)
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $result = mysqli_query($bdd, "SELECT * from employes where noemp =" . $id . ";");
+    $donnees = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    mysqli_free_result($result);
+    mysqli_close($bdd);
+    return $donnees;
+}

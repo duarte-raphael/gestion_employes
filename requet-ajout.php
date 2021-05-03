@@ -1,11 +1,26 @@
 <?php
 
-
 if (
     isset($_POST["noemp"]) && isset($_POST["nom"]) && isset($_POST["prenom"]) &&
     isset($_POST["emploi"]) && isset($_POST["sup"]) && isset($_POST["embauche"]) && isset($_POST["sal"]) &&
     isset($_POST["comm"]) && isset($_POST["noserv"])
 ) {
+    $nextId = maxNoemp();
+
+    if ($_POST["comm"] == "") {
+        $commission = "null";
+    } else {
+        $commission = $_POST["comm"];
+    }
+    insererEmp($_POST,  $commission, $nextId);
+
+    header("location: tableau.php");
+} else {
+    echo "erreur de saisie";
+}
+
+function maxNoemp()
+{
     $bdd = mysqli_init();
     mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
     $findNextId = "SELECT max(noemp) FROM employes;";
@@ -13,27 +28,24 @@ if (
     $data = mysqli_fetch_array($max, MYSQLI_NUM);
     $nextId = $data[0] + 1;
     mysqli_free_result($max);
+    mysqli_close($bdd);
+    return $nextId;
+}
 
-    if ($_POST["comm"] == "") {
-        $commission = "null";
-    } else {
-        $commission = $_POST["comm"];
-    }
-
+function insererEmp($tab, $comm, $Id)
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
     $requette = "INSERT INTO employes (noemp, nom, prenom, emploi, sup, embauche, sal, comm, noserv) 
-    VALUES (" . $nextId . ", 
-    '" . $_POST["nom"] . "',
-    '" . $_POST["prenom"] . "',
-    '" . $_POST["emploi"] . "',
-    " . $_POST["sup"] . ",
-    '" . $_POST["embauche"] . "',
-    " . $_POST["sal"] . ",
-    " . $commission . ",
-    " . $_POST["noserv"] . ");";
-
+    VALUES (" . $Id . ", 
+    '" . $tab["nom"] . "',
+    '" . $tab["prenom"] . "',
+    '" . $tab["emploi"] . "',
+    " . $tab["sup"] . ",
+    '" . $tab["embauche"] . "',
+    " . $tab["sal"] . ",
+    " . $comm . ",
+    " . $tab["noserv"] . ");";
     mysqli_query($bdd, $requette);
     mysqli_close($bdd);
-    // header("location: tableau.php");
-} else {
-    echo "erreur de saisie";
 }

@@ -2,15 +2,10 @@
 
 $isThereError = false;
 $msg = [];
-var_dump($_POST);
 if (!empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
 
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $findMdp = "SELECT * FROM utilisateur WHERE nom = '" . $_POST["nom"] . "';";
-    $requetMdp = mysqli_query($bdd, $findMdp);
-    $dataUtilisateur = mysqli_fetch_array($requetMdp, MYSQLI_ASSOC);
-    mysqli_free_result($requetMdp);
+    $dataUtilisateur = selectAllByNom($_POST["nom"]);
+
 
     if (password_verify($_POST["hash_password"], $dataUtilisateur["hash_password"])) {
         session_start();
@@ -21,8 +16,6 @@ if (!empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
         $isThereError = true;
         $msg[] = "Erreur de connexion. ";
     }
-
-    mysqli_close($bdd);
 } else {
     $isThereError = true;
     $msg[] = "veuillez remplir les champs";
@@ -74,3 +67,16 @@ if (!empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
 </body>
 
 </html>
+<?php
+
+function selectAllByNom($nom)
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $findMdp = "SELECT * FROM utilisateur WHERE nom = '" . $nom . "';";
+    $requetMdp = mysqli_query($bdd, $findMdp);
+    $dataUtilisateur = mysqli_fetch_array($requetMdp, MYSQLI_ASSOC);
+    mysqli_free_result($requetMdp);
+    mysqli_close($bdd);
+    return $dataUtilisateur;
+}

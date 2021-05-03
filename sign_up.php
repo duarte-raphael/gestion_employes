@@ -3,24 +3,16 @@
     $isThereError = false;
     $messages = [];
     if (isset($_POST) && !empty($_POST)) {
+        $nextId = nextId();
 
-        $bdd = mysqli_init();
-        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-        $findNextId = "SELECT max(id) FROM utilisateur;";
-        $max = mysqli_query($bdd, $findNextId);
-        $data = mysqli_fetch_array($max, MYSQLI_NUM);
-        mysqli_free_result($max);
-        $nextId = $data[0] + 1;
         $hash = password_hash($_POST["hash_password"], PASSWORD_DEFAULT);
 
         if (isset($_POST["nom"]) && empty($_POST["nom"])) {
             $isThereError = true;
             $messages[] = "veuillez saisir un pseudo. ";
         } else {
-            $nomUnique = "SELECT DISTINCT nom FROM utilisateur;";
-            $requeteNomUnique = mysqli_query($bdd, $nomUnique);
-            $tabNom = mysqli_fetch_array($requeteNomUnique, MYSQLI_ASSOC);
-            mysqli_free_result($requeteNomUnique);
+            $tabNom = listeNomUser();
+
             foreach ($tabNom as $nom) {
                 if ($_POST["nom"] == $nom) {
                     $isThereError = true;
@@ -34,10 +26,7 @@
         }
 
         if (!$isThereError && !empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
-            $inserer = "INSERT INTO utilisateur (id, nom, hash_password) 
-                     VALUES (" . $nextId . ", '" . $_POST["nom"] . "', '" . $hash . "');";
-            mysqli_query($bdd, $inserer);
-            mysqli_close($bdd);
+            insererUser($nextId, $_POST["nom"], $hash);
             header("location: sign_in.php");
         }
     }
@@ -85,3 +74,38 @@
     </body>
 
     </html>
+
+    <?php
+    function nextId()
+    {
+        $bdd = mysqli_init();
+        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+        $findNextId = "SELECT max(id) FROM utilisateur;";
+        $max = mysqli_query($bdd, $findNextId);
+        $data = mysqli_fetch_array($max, MYSQLI_NUM);
+        mysqli_free_result($max);
+        $nextId = $data[0] + 1;
+        mysqli_close($bdd);
+        return $nextId;
+    }
+
+    function listeNomUser()
+    {
+        $bdd = mysqli_init();
+        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+        $nomUnique = "SELECT DISTINCT nom FROM utilisateur;";
+        $requeteNomUnique = mysqli_query($bdd, $nomUnique);
+        $tabNom = mysqli_fetch_array($requeteNomUnique, MYSQLI_ASSOC);
+        mysqli_free_result($requeteNomUnique);
+        mysqli_close($bdd);
+        return $tabNom;
+    }
+    function insererUser($id, $nom, $mdpHash)
+    {
+        $bdd = mysqli_init();
+        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+        $inserer = "INSERT INTO utilisateur (id, nom, hash_password) 
+        VALUES (" . $id . ", '" . $nom . "', '" . $mdpHash . "');";
+        mysqli_query($bdd, $inserer);
+        mysqli_close($bdd);
+    }

@@ -20,19 +20,17 @@ if (!$_SESSION['nom']) {
 <body>
     <?php
 
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $result = mysqli_query($bdd, "select * from employes;");
-    $donnees = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $donnees = selectAllEmploye();
+
     $tableau = [];
-    $afficheSup = mysqli_query($bdd, "SELECT DISTINCT sup FROM employes;");
-    $tabSup = mysqli_fetch_all($afficheSup, MYSQLI_ASSOC);
+
+    $tabSup = listeChef();
+
     for ($i = 0; $i < sizeof($tabSup); $i++) {
         $tableau[$i] = $tabSup[$i]["sup"];
     }
-    $saisie = "SELECT COUNT(date_ajout) FROM employes WHERE date_ajout = DATE_FORMAT(SYSDATE(),'%Y-%m-%d');";
-    $resultatDate = mysqli_query($bdd, $saisie);
-    $compteur = mysqli_fetch_array($resultatDate, MYSQLI_NUM);
+    $compteur = compteur();
+
     ?>
 
     <div>nombre d'employes ajoutes aujourd'hui : <?php echo $compteur[0] ?></div>
@@ -83,8 +81,6 @@ if (!$_SESSION['nom']) {
             // <?php if (!in_array($employe['noemp'], $tableau)) {
         }
 
-        mysqli_close($bdd);
-
         ?>
     </table>
 
@@ -95,3 +91,38 @@ if (!$_SESSION['nom']) {
 </body>
 
 </html>
+<?php
+
+function selectAllEmploye()
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $result = mysqli_query($bdd, "select * from employes;");
+    $d = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    mysqli_free_result($result);
+    mysqli_close($bdd);
+    return $d;
+}
+
+function listeChef()
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $afficheSup = mysqli_query($bdd, "SELECT DISTINCT sup FROM employes;");
+    $tabSup = mysqli_fetch_all($afficheSup, MYSQLI_ASSOC);
+    mysqli_free_result($afficheSup);
+    mysqli_close($bdd);
+    return $tabSup;
+}
+
+function compteur()
+{
+    $bdd = mysqli_init();
+    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $saisie = "SELECT COUNT(date_ajout) FROM employes WHERE date_ajout = DATE_FORMAT(SYSDATE(),'%Y-%m-%d');";
+    $resultatDate = mysqli_query($bdd, $saisie);
+    $compteur = mysqli_fetch_array($resultatDate, MYSQLI_NUM);
+    mysqli_free_result($resultatDate);
+    mysqli_close($bdd);
+    return $compteur;
+}
