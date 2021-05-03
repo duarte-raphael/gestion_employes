@@ -21,31 +21,34 @@ if (
 
 function maxNoemp()
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $findNextId = "SELECT max(noemp) FROM employes;";
-    $max = mysqli_query($bdd, $findNextId);
-    $data = mysqli_fetch_array($max, MYSQLI_NUM);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("SELECT max(noemp) FROM employes;");
+    $stmt->execute();
+    $rs = $stmt->get_result();
+    $data = $rs->fetch_array(MYSQLI_NUM);
     $nextId = $data[0] + 1;
-    mysqli_free_result($max);
-    mysqli_close($bdd);
+    $db->close();
     return $nextId;
 }
 
+//pas reussi encore
 function insererEmp($tab, $comm, $Id)
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $requette = "INSERT INTO employes (noemp, nom, prenom, emploi, sup, embauche, sal, comm, noserv) 
-    VALUES (" . $Id . ", 
-    '" . $tab["nom"] . "',
-    '" . $tab["prenom"] . "',
-    '" . $tab["emploi"] . "',
-    " . $tab["sup"] . ",
-    '" . $tab["embauche"] . "',
-    " . $tab["sal"] . ",
-    " . $comm . ",
-    " . $tab["noserv"] . ");";
-    mysqli_query($bdd, $requette);
-    mysqli_close($bdd);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("INSERT INTO employes (noemp, nom, prenom, emploi, sup, embauche, sal, comm, noserv) 
+    VALUES (?,?,?,?,?,?,?,?,?);");
+    $stmt->bind_param(
+        "isssisddi",
+        $Id,
+        $tab["nom"],
+        $tab["prenom"],
+        $tab["emploi"],
+        $tab["sup"],
+        $tab["embauche"],
+        $tab["sal"],
+        $comm,
+        $tab["noserv"]
+    );
+    $stmt->execute();
+    $db->close();
 }

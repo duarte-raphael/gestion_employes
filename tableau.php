@@ -95,34 +95,33 @@ if (!$_SESSION['nom']) {
 
 function selectAllEmploye()
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $result = mysqli_query($bdd, "select * from employes;");
-    $d = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    mysqli_free_result($result);
-    mysqli_close($bdd);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("SELECT * FROM employes;");
+    $stmt->execute();
+    $rs = $stmt->get_result();
+    $d = $rs->fetch_all(MYSQLI_ASSOC);
+    $db->close();
     return $d;
 }
 
 function listeChef()
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $afficheSup = mysqli_query($bdd, "SELECT DISTINCT sup FROM employes;");
-    $tabSup = mysqli_fetch_all($afficheSup, MYSQLI_ASSOC);
-    mysqli_free_result($afficheSup);
-    mysqli_close($bdd);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("SELECT DISTINCT sup FROM employes;");
+    $stmt->execute();
+    $rs = $stmt->get_result();
+    $tabSup = $rs->fetch_all(MYSQLI_ASSOC);
+    $db->close();
     return $tabSup;
 }
 
 function compteur()
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $saisie = "SELECT COUNT(date_ajout) FROM employes WHERE date_ajout = DATE_FORMAT(SYSDATE(),'%Y-%m-%d');";
-    $resultatDate = mysqli_query($bdd, $saisie);
-    $compteur = mysqli_fetch_array($resultatDate, MYSQLI_NUM);
-    mysqli_free_result($resultatDate);
-    mysqli_close($bdd);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("SELECT COUNT(date_ajout) FROM employes WHERE date_ajout = DATE_FORMAT(SYSDATE(),'%Y-%m-%d');");
+    $stmt->execute();
+    $rs = $stmt->get_result();
+    $compteur = $rs->fetch_array(MYSQLI_NUM);
+    $db->close();
     return $compteur;
 }

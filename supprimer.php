@@ -16,8 +16,9 @@ if (isset($_GET["id"])) {
 
 function supprimeEmployes($id)
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    mysqli_query($bdd, "DELETE FROM employes WHERE noemp = " . $id . ";");
-    mysqli_close($bdd);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("DELETE FROM employes WHERE noemp = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $db->close();
 }

@@ -71,12 +71,12 @@ if (!empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
 
 function selectAllByNom($nom)
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $findMdp = "SELECT * FROM utilisateur WHERE nom = '" . $nom . "';";
-    $requetMdp = mysqli_query($bdd, $findMdp);
-    $dataUtilisateur = mysqli_fetch_array($requetMdp, MYSQLI_ASSOC);
-    mysqli_free_result($requetMdp);
-    mysqli_close($bdd);
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("SELECT * FROM utilisateur WHERE nom = ?");
+    $stmt->bind_param("s", $nom);
+    $stmt->execute();
+    $rs = $stmt->get_result();
+    $dataUtilisateur = $rs->fetch_array(MYSQLI_ASSOC);
+    $db->close();
     return $dataUtilisateur;
 }

@@ -78,34 +78,32 @@
     <?php
     function nextId()
     {
-        $bdd = mysqli_init();
-        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-        $findNextId = "SELECT max(id) FROM utilisateur;";
-        $max = mysqli_query($bdd, $findNextId);
-        $data = mysqli_fetch_array($max, MYSQLI_NUM);
-        mysqli_free_result($max);
+        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $stmt = $db->prepare("SELECT max(id) FROM utilisateur;");
+        $stmt->execute();
+        $rs = $stmt->get_result();
+        $data = $rs->fetch_array(MYSQLI_NUM);
         $nextId = $data[0] + 1;
-        mysqli_close($bdd);
+        $db->close();
         return $nextId;
     }
 
     function listeNomUser()
     {
-        $bdd = mysqli_init();
-        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-        $nomUnique = "SELECT DISTINCT nom FROM utilisateur;";
-        $requeteNomUnique = mysqli_query($bdd, $nomUnique);
-        $tabNom = mysqli_fetch_array($requeteNomUnique, MYSQLI_ASSOC);
-        mysqli_free_result($requeteNomUnique);
-        mysqli_close($bdd);
+        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $stmt = $db->prepare("SELECT DISTINCT nom FROM utilisateur;");
+        $stmt->execute();
+        $rs = $stmt->get_result();
+        $tabNom = $rs->fetch_array(MYSQLI_ASSOC);
+        $db->close();
         return $tabNom;
     }
     function insererUser($id, $nom, $mdpHash)
     {
-        $bdd = mysqli_init();
-        mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-        $inserer = "INSERT INTO utilisateur (id, nom, hash_password) 
-        VALUES (" . $id . ", '" . $nom . "', '" . $mdpHash . "');";
-        mysqli_query($bdd, $inserer);
-        mysqli_close($bdd);
+        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $stmt = $db->prepare("INSERT INTO utilisateur (id, nom, hash_password) 
+        VALUES (" . $id . ", '" . $nom . "', '" . $mdpHash . "');");
+        $stmt->bind_param("iss", $id, $nom, $mdpHash);
+        $stmt->execute();
+        $db->close();
     }

@@ -107,32 +107,45 @@ if (!$_SESSION['nom']) {
 </html>
 
 <?php
-
+// pas encore mo
 function updateEmploye($tab, $comm)
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $requette = "UPDATE employes SET 
-nom = '" . $tab["nom"] . "',
-prenom = '" . $tab["prenom"] . "',
-emploi = '" . $tab["emploi"] . "',
-sup = " . $tab["sup"] . ",
-embauche = '" . $tab["embauche"] . "',
-sal = " . $tab["sal"] . ",
-comm = " . $comm . ",
-noserv = " . $tab["noserv"] . "
-WHERE noemp = " . $tab["id"] . ";";
-    mysqli_query($bdd, $requette);
-    mysqli_close($bdd);
+    $db = mysqli_init();
+    mysqli_real_connect($db, "127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("UPDATE employes SET 
+nom = ?,
+prenom = ?,
+emploi = ?,
+sup = ?,
+embauche = ?,
+sal = ?,
+comm = ?,
+noserv = ?
+WHERE noemp = ?;");
+    $stmt->bind_param(
+        "isssisddi",
+        $tab["nom"],
+        $tab["prenom"],
+        $tab["emploi"],
+        $tab["sup"],
+        $tab["embauche"],
+        $tab["sal"],
+        $comm,
+        $tab["noserv"],
+        $tab["id"]
+    );
+    $stmt->execute();
+    mysqli_close($db);
 }
 
 function selectAllById($id)
 {
-    $bdd = mysqli_init();
-    mysqli_real_connect($bdd, "127.0.0.1", "rafael", "rafael", "entreprise");
-    $result = mysqli_query($bdd, "SELECT * from employes where noemp =" . $id . ";");
-    $donnees = mysqli_fetch_array($result, MYSQLI_ASSOC);
-    mysqli_free_result($result);
-    mysqli_close($bdd);
-    return $donnees;
+    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+    $stmt = $db->prepare("SELECT * from employes where noemp = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $rs = $stmt->get_result();
+    $tabNom = $rs->fetch_array(MYSQLI_ASSOC);
+    $db->close();
+    return $tabNom;
 }
