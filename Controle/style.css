@@ -1,0 +1,11 @@
+.formulaire {
+  border: 2px solid black;
+  margin-top: 20%;
+  margin-left: 25%;
+  padding: 10px;
+  border-radius: 10px;
+  width: 50%;
+}
+.btn {
+  margin-left: 233px;
+}
