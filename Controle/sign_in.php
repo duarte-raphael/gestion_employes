@@ -1,16 +1,18 @@
 <?php
 
+include_once(__DIR__ . "/../Service/UtilisateurService.php");
+$objCo = new UtilisateurService;
 $isThereError = false;
 $msg = [];
 if (!empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
 
-    $dataUtilisateur = selectAllByNom($_POST["nom"]);
+    $dataUtilisateur = $objCo->selectAllByNom($_POST["nom"]);
 
 
-    if (password_verify($_POST["hash_password"], $dataUtilisateur["hash_password"])) {
+    if (password_verify($_POST["hash_password"], $dataUtilisateur->getHash_password())) {
         session_start();
-        $_SESSION["nom"] = $dataUtilisateur["nom"];
-        $_SESSION["profil"] = $dataUtilisateur["profil"];
+        $_SESSION["nom"] = $dataUtilisateur->getNom();
+        $_SESSION["profil"] = $dataUtilisateur->getProfil();
         header("location: tableau.php");
     } else {
         $isThereError = true;
@@ -68,15 +70,3 @@ if (!empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
 
 </html>
 <?php
-
-function selectAllByNom($nom)
-{
-    $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-    $stmt = $db->prepare("SELECT * FROM utilisateur WHERE nom = ?");
-    $stmt->bind_param("s", $nom);
-    $stmt->execute();
-    $rs = $stmt->get_result();
-    $dataUtilisateur = $rs->fetch_array(MYSQLI_ASSOC);
-    $db->close();
-    return $dataUtilisateur;
-}

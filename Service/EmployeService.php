@@ -1,6 +1,6 @@
 <?php
 
-include_once(__DIR__ . "../DAO/EmployeDAO.php");
+include_once(__DIR__ . "/../DAO/EmployeDAO.php");
 
 class EmployeService extends EmployeDAO
 {
@@ -21,7 +21,7 @@ class EmployeService extends EmployeDAO
     function updateEmploye(Employe $obj, int $id): void
     {
         $objDAO = new EmployeDAO;
-        $objDAO->insererEmp($obj, $id);
+        $objDAO->updateEmploye($obj, $id);
     }
 
     function supprimeEmployes(int $id): void

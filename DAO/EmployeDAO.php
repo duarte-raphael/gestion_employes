@@ -1,12 +1,13 @@
 <?php
 
 include_once(__DIR__ . "/../Modal/Employe.php");
-include_once(__DIR__ . "/../Modal/Common.php");
-class EmployeDAO
+include_once(__DIR__ . "/Common.php");
+
+class EmployeDAO extends Common
 {
     function supprimeEmployes(int $id): void
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $stmt = $db->prepare("DELETE FROM employes WHERE noemp = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -15,7 +16,7 @@ class EmployeDAO
 
     function selectAllEmploye(): array
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $stmt = $db->prepare("SELECT * FROM employes;");
         $stmt->execute();
         $rs = $stmt->get_result();
@@ -41,7 +42,7 @@ class EmployeDAO
 
     function listeChef(): array
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $stmt = $db->prepare("SELECT DISTINCT sup FROM employes;");
         $stmt->execute();
         $rs = $stmt->get_result();
@@ -52,7 +53,7 @@ class EmployeDAO
 
     function compteur(): int
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $stmt = $db->prepare("SELECT COUNT(date_ajout) FROM employes WHERE date_ajout = DATE_FORMAT(SYSDATE(),'%Y-%m-%d');");
         $stmt->execute();
         $rs = $stmt->get_result();
@@ -63,7 +64,7 @@ class EmployeDAO
 
     function updateEmploye(Employe $obj, int $id): void
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $nom = $obj->getNom();
         $prenom = $obj->getPrenom();
         $emploi = $obj->getEmploi();
@@ -83,7 +84,7 @@ class EmployeDAO
                 noserv = ?
                 WHERE noemp = ?;");
         $stmt->bind_param(
-            "isssisddi",
+            "sssisddii",
             $nom,
             $prenom,
             $emploi,
@@ -100,13 +101,14 @@ class EmployeDAO
 
     function selectAllById(int $id): Employe
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $stmt = $db->prepare("SELECT * from employes where noemp = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $rs = $stmt->get_result();
         $tabNom = $rs->fetch_array(MYSQLI_ASSOC);
         $obj = new Employe;
+        $obj->setNoemp($tabNom["noemp"]);
         $obj->setNom($tabNom["nom"]);
         $obj->setPrenom($tabNom["prenom"]);
         $obj->setEmploi($tabNom["emploi"]);
@@ -121,7 +123,7 @@ class EmployeDAO
 
     function maxNoemp(): int
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $stmt = $db->prepare("SELECT max(noemp) FROM employes;");
         $stmt->execute();
         $rs = $stmt->get_result();
@@ -133,7 +135,7 @@ class EmployeDAO
 
     function insererEmp(Employe $obj): void
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();
         $idMax = $this->maxNoemp();
         $nom = $obj->getNom();
         $prenom = $obj->getPrenom();

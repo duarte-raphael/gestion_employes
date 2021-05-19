@@ -26,7 +26,6 @@ if (!$_SESSION['nom']) {
 
 
     $tabSup = $obj->listeChef();
-    var_dump($tabSup);
     for ($i = 0; $i < sizeof($tabSup); $i++) {
         $tableau[$i] = $tabSup[$i]["sup"];
     }
@@ -92,37 +91,3 @@ if (!$_SESSION['nom']) {
 </body>
 
 </html>
-<?php
-
-// function selectAllEmploye()
-// {
-//     $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-//     $stmt = $db->prepare("SELECT * FROM employes;");
-//     $stmt->execute();
-//     $rs = $stmt->get_result();
-//     $d = $rs->fetch_all(MYSQLI_ASSOC);
-//     $db->close();
-//     return $d;
-// }
-
-// function listeChef()
-// {
-//     $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-//     $stmt = $db->prepare("SELECT DISTINCT sup FROM employes;");
-//     $stmt->execute();
-//     $rs = $stmt->get_result();
-//     $tabSup = $rs->fetch_all(MYSQLI_ASSOC);
-//     $db->close();
-//     return $tabSup;
-// }
-
-// function compteur()
-// {
-//     $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-//     $stmt = $db->prepare("SELECT COUNT(date_ajout) FROM employes WHERE date_ajout = DATE_FORMAT(SYSDATE(),'%Y-%m-%d');");
-//     $stmt->execute();
-//     $rs = $stmt->get_result();
-//     $compteur = $rs->fetch_array(MYSQLI_NUM);
-//     $db->close();
-//     return $compteur;
-// } -->

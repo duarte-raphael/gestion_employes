@@ -1,13 +1,14 @@
 <?php
 
-include_once(__DIR__ . "../Modal/Utilisateur.php");
-include_once(__DIR__ . "/../Modal/Common.php");
+include_once(__DIR__ . "/../Modal/Utilisateur.php");
+include_once(__DIR__ . "/Common.php");
 
-class UtilisateurDAO
+class UtilisateurDAO extends Common
 {
     function selectAllByNom($nom): Utilisateur
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+
+        $db = $this->connexion();
         $stmt = $db->prepare("SELECT * FROM utilisateur WHERE nom = ?");
         $stmt->bind_param("s", $nom);
         $stmt->execute();
@@ -24,7 +25,7 @@ class UtilisateurDAO
 
     function nextId(): int
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();;
         $stmt = $db->prepare("SELECT max(id) FROM utilisateur;");
         $stmt->execute();
         $rs = $stmt->get_result();
@@ -36,7 +37,7 @@ class UtilisateurDAO
 
     function listeNomUser(): array
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();;
         $stmt = $db->prepare("SELECT DISTINCT nom FROM utilisateur;");
         $stmt->execute();
         $rs = $stmt->get_result();
@@ -46,7 +47,7 @@ class UtilisateurDAO
     }
     function insererUser(Utilisateur $obj): void
     {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
+        $db = $this->connexion();;
         $id = $this->nextId();
         $nom = $obj->getNom();
         $mdpHash = $obj->getHash_password();

@@ -1,9 +1,11 @@
     <?php
 
+    include_once(__DIR__ . "/../Service/UtilisateurService.php");
+    $objUser = new UtilisateurService;
     $isThereError = false;
     $messages = [];
     if (isset($_POST) && !empty($_POST)) {
-        $nextId = nextId();
+        $nextId = $objUser->nextId();
 
         $hash = password_hash($_POST["hash_password"], PASSWORD_DEFAULT);
 
@@ -11,7 +13,7 @@
             $isThereError = true;
             $messages[] = "veuillez saisir un pseudo. ";
         } else {
-            $tabNom = listeNomUser();
+            $tabNom = $objUser->listeNomUser();
 
             foreach ($tabNom as $nom) {
                 if ($_POST["nom"] == $nom) {
@@ -26,7 +28,11 @@
         }
 
         if (!$isThereError && !empty($_POST["nom"]) && !empty($_POST["hash_password"])) {
-            insererUser($nextId, $_POST["nom"], $hash);
+            $objInsert = new Utilisateur;
+            $objInsert->setId($nextId);
+            $objInsert->setNom($_POST["nom"]);
+            $objInsert->setHash_password($hash);
+            $objUser->insererUser($objInsert);
             header("location: sign_in.php");
         }
     }
@@ -74,36 +80,3 @@
     </body>
 
     </html>
-
-    <?php
-    function nextId()
-    {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-        $stmt = $db->prepare("SELECT max(id) FROM utilisateur;");
-        $stmt->execute();
-        $rs = $stmt->get_result();
-        $data = $rs->fetch_array(MYSQLI_NUM);
-        $nextId = $data[0] + 1;
-        $db->close();
-        return $nextId;
-    }
-
-    function listeNomUser()
-    {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-        $stmt = $db->prepare("SELECT DISTINCT nom FROM utilisateur;");
-        $stmt->execute();
-        $rs = $stmt->get_result();
-        $tabNom = $rs->fetch_array(MYSQLI_ASSOC);
-        $db->close();
-        return $tabNom;
-    }
-    function insererUser($id, $nom, $mdpHash)
-    {
-        $db = new mysqli("127.0.0.1", "rafael", "rafael", "entreprise");
-        $stmt = $db->prepare("INSERT INTO utilisateur (id, nom, hash_password) 
-        VALUES (" . $id . ", '" . $nom . "', '" . $mdpHash . "');");
-        $stmt->bind_param("iss", $id, $nom, $mdpHash);
-        $stmt->execute();
-        $db->close();
-    }
